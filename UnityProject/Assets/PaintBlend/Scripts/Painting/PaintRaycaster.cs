@@ -12,6 +12,8 @@ namespace PaintBlend.Painting
             Radius = 0.035f, Opacity = 1f, Hardness = 0.8f, Colour = Color.magenta
         };
 
+        private PaintSurface activeStrokeSurface;
+        private bool strokeActive;
         public BrushSettings CurrentBrush { get => brush; set => brush = value; }
 
         private void Awake()
