@@ -41,7 +41,9 @@ namespace PaintBlend.Editor
             public int Row;
             public bool Outdoor;
             public bool Atrium;
-            public Vector3 Center => new Vector3((Column - 2) * StepX, 0f, (2 - Row) * StepZ);
+            public int FloorIndex;
+            public float FloorY => FloorIndex * 5.5f;
+            public Vector3 Center => new Vector3((Column - 2) * StepX, FloorY, (2 - Row) * StepZ);
         }
 
         [MenuItem("Tools/Paint & Blend/Build Grand Hall Blockout")]
@@ -118,7 +120,9 @@ namespace PaintBlend.Editor
                     Column = col,
                     Row = row,
                     Outdoor = id == "GardenCourtyard" || id == "RooftopTerrace",
-                    Atrium = id == "GrandHall"
+                    Atrium = id == "GrandHall",
+                    FloorIndex = (row <= 1 || id == "Attic" || id == "RooftopTerrace") ? 1 :
+                        (id == "Basement" ? -1 : 0)
                 });
             }
             return result;
@@ -168,7 +172,7 @@ namespace PaintBlend.Editor
                 GameObject roomRoot = Child(architecture, room.Id + " — " + room.Title);
                 roomRoot.transform.position = room.Center;
                 RoomMarker marker = roomRoot.AddComponent<RoomMarker>();
-                marker.Configure(room.Id, room.Title, room.Theme, 0);
+                marker.Configure(room.Id, room.Title, room.Theme, room.FloorIndex);
 
                 float height = room.Atrium ? 11f : 5.2f;
                 float width = RoomWidth;
@@ -214,14 +218,38 @@ namespace PaintBlend.Editor
             }
         }
 
+        private static RoomData RoomAt(int column, int row)
+        {
+            for (int i = 0; i < Rooms.Count; i++)
+                if (Rooms[i].Column == column && Rooms[i].Row == row) return Rooms[i];
+            return null;
+        }
+
+        private static bool AreStairLinked(RoomData a, RoomData b)
+        {
+            if (a == null || b == null) return false;
+            return Pair(a, b, "DiningRoom", "GrandHall") ||
+                   Pair(a, b, "LaundryRoom", "Attic") ||
+                   Pair(a, b, "Gym", "Basement") ||
+                   Pair(a, b, "MusicStudio", "RooftopTerrace");
+        }
+
+        private static bool Pair(RoomData a, RoomData b, string first, string second)
+        {
+            return (a.Id == first && b.Id == second) || (a.Id == second && b.Id == first);
+        }
+
+        private static bool IsConnected(RoomData a, RoomData b)
+        {
+            return a != null && b != null &&
+                   (a.FloorIndex == b.FloorIndex || AreStairLinked(a, b));
+        }
+
         private static bool HasNeighbour(RoomData room, Vector3 direction)
         {
             int dc = Mathf.RoundToInt(direction.x);
             int dr = -Mathf.RoundToInt(direction.z);
-            for (int i = 0; i < Rooms.Count; i++)
-                if (Rooms[i].Column == room.Column + dc && Rooms[i].Row == room.Row + dr)
-                    return true;
-            return false;
+            return IsConnected(room, RoomAt(room.Column + dc, room.Row + dr));
         }
 
         private static void BuildWallDoor(Transform parent, string side, float length, float height, Material wall)
@@ -330,40 +358,113 @@ namespace PaintBlend.Editor
         {
             Material floor = Mat("CorridorFloor", new Color(0.89f, 0.78f, 0.72f), 0.04f, 0.65f);
             Material border = Mat("CorridorBorder", new Color(0.58f, 0.34f, 0.22f));
+
+            // Horizontal room-to-room links.
             for (int row = 0; row < 5; row++)
             for (int col = 0; col < 4; col++)
             {
-                float x = (col - 1.5f) * StepX;
-                float z = (2 - row) * StepZ;
-                Cube("East-West Corridor", parent, new Vector3(x, -0.12f, z),
-                    new Vector3(StepX - RoomWidth, 0.24f, RoomDepth), floor);
-                Cube("Corridor Edge North", parent, new Vector3(x, 0.08f, z + RoomDepth * 0.5f),
-                    new Vector3(StepX - RoomWidth, 0.16f, 0.18f), border);
-                Cube("Corridor Edge South", parent, new Vector3(x, 0.08f, z - RoomDepth * 0.5f),
-                    new Vector3(StepX - RoomWidth, 0.16f, 0.18f), border);
+                RoomData a = RoomAt(col, row);
+                RoomData b = RoomAt(col + 1, row);
+                if (!IsConnected(a, b)) continue;
+                if (a.FloorIndex == b.FloorIndex)
+                {
+                    float x = (a.Center.x + b.Center.x) * 0.5f;
+                    float z = a.Center.z;
+                    Cube("East-West Corridor", parent, new Vector3(x, a.FloorY - 0.12f, z),
+                        new Vector3(StepX - RoomWidth, 0.24f, RoomDepth), floor);
+                    Cube("Corridor Edge North", parent, new Vector3(x, a.FloorY + 0.08f, z + RoomDepth * 0.5f),
+                        new Vector3(StepX - RoomWidth, 0.16f, 0.18f), border);
+                    Cube("Corridor Edge South", parent, new Vector3(x, a.FloorY + 0.08f, z - RoomDepth * 0.5f),
+                        new Vector3(StepX - RoomWidth, 0.16f, 0.18f), border);
+                }
+                else BuildStairConnector(parent, a, b, floor, border);
             }
 
+            // North-south room-to-room links.
             for (int row = 0; row < 4; row++)
             for (int col = 0; col < 5; col++)
             {
-                float x = (col - 2) * StepX;
-                float z = ((2 - row) * StepZ) - StepZ * 0.5f;
-                Cube("North-South Corridor", parent, new Vector3(x, -0.12f, z),
-                    new Vector3(RoomWidth, 0.24f, StepZ - RoomDepth), floor);
-                Cube("Corridor Edge East", parent, new Vector3(x + RoomWidth * 0.5f, 0.08f, z),
-                    new Vector3(0.18f, 0.16f, StepZ - RoomDepth), border);
-                Cube("Corridor Edge West", parent, new Vector3(x - RoomWidth * 0.5f, 0.08f, z),
-                    new Vector3(0.18f, 0.16f, StepZ - RoomDepth), border);
+                RoomData a = RoomAt(col, row);
+                RoomData b = RoomAt(col, row + 1);
+                if (!IsConnected(a, b)) continue;
+                if (a.FloorIndex == b.FloorIndex)
+                {
+                    float x = a.Center.x;
+                    float z = (a.Center.z + b.Center.z) * 0.5f;
+                    Cube("North-South Corridor", parent, new Vector3(x, a.FloorY - 0.12f, z),
+                        new Vector3(RoomWidth, 0.24f, StepZ - RoomDepth), floor);
+                    Cube("Corridor Edge East", parent, new Vector3(x + RoomWidth * 0.5f, a.FloorY + 0.08f, z),
+                        new Vector3(0.18f, 0.16f, StepZ - RoomDepth), border);
+                    Cube("Corridor Edge West", parent, new Vector3(x - RoomWidth * 0.5f, a.FloorY + 0.08f, z),
+                        new Vector3(0.18f, 0.16f, StepZ - RoomDepth), border);
+                }
+                else BuildStairConnector(parent, a, b, floor, border);
             }
 
-            // Wider junction pads connect the orthogonal corridor strips.
+            // Fill only junctions whose four adjoining rooms share one floor.
             for (int row = 0; row < 4; row++)
             for (int col = 0; col < 4; col++)
             {
-                float x = (col - 1.5f) * StepX;
-                float z = ((2 - row) * StepZ) - StepZ * 0.5f;
-                Cube("Corridor Junction", parent, new Vector3(x, -0.11f, z),
+                RoomData a = RoomAt(col, row);
+                RoomData b = RoomAt(col + 1, row);
+                RoomData d = RoomAt(col, row + 1);
+                RoomData e = RoomAt(col + 1, row + 1);
+                if (a == null || b == null || d == null || e == null) continue;
+                if (a.FloorIndex != b.FloorIndex || a.FloorIndex != d.FloorIndex ||
+                    a.FloorIndex != e.FloorIndex) continue;
+                float x = (a.Center.x + b.Center.x) * 0.5f;
+                float z = (a.Center.z + d.Center.z) * 0.5f;
+                Cube("Connected Corridor Junction", parent,
+                    new Vector3(x, a.FloorY - 0.11f, z),
                     new Vector3(StepX - RoomWidth, 0.22f, StepZ - RoomDepth), floor);
+            }
+        }
+
+        private static void BuildStairConnector(Transform parent, RoomData a, RoomData b,
+            Material tread, Material rail)
+        {
+            bool alongX = a.Row == b.Row;
+            Vector3 delta = b.Center - a.Center;
+            float start = alongX
+                ? a.Center.x + Mathf.Sign(delta.x) * RoomWidth * 0.5f
+                : a.Center.z + Mathf.Sign(delta.z) * RoomDepth * 0.5f;
+            float finish = alongX
+                ? b.Center.x - Mathf.Sign(delta.x) * RoomWidth * 0.5f
+                : b.Center.z - Mathf.Sign(delta.z) * RoomDepth * 0.5f;
+            const int steps = 14;
+            float run = Mathf.Abs(finish - start);
+            float rise = b.FloorY - a.FloorY;
+            float treadRun = run / steps;
+            float treadRise = Mathf.Abs(rise) / steps;
+            float direction = Mathf.Sign(finish - start);
+
+            for (int i = 0; i < steps; i++)
+            {
+                float t = (i + 0.5f) / steps;
+                float axis = Mathf.Lerp(start, finish, t);
+                float y = Mathf.Lerp(a.FloorY, b.FloorY, t) - Mathf.Abs(rise) / (steps * 2f);
+                Vector3 position = alongX
+                    ? new Vector3(axis, y, a.Center.z)
+                    : new Vector3(a.Center.x, y, axis);
+                Vector3 size = alongX
+                    ? new Vector3(treadRun + 0.06f, Mathf.Max(0.18f, treadRise), DoorWidth)
+                    : new Vector3(DoorWidth, Mathf.Max(0.18f, treadRise), treadRun + 0.06f);
+                Cube("Interfloor Stair Tread " + a.Id + "_" + i, parent, position, size, tread);
+            }
+
+            float railY = (a.FloorY + b.FloorY) * 0.5f + 0.9f;
+            float railAxis = (start + finish) * 0.5f;
+            if (alongX)
+            {
+                for (int side = -1; side <= 1; side += 2)
+                    Cube("Stair Handrail", parent, new Vector3(railAxis, railY, a.Center.z + side * 1.8f),
+                        new Vector3(run, 0.16f, 0.16f), rail);
+            }
+            else
+            {
+                for (int side = -1; side <= 1; side += 2)
+                    Cube("Stair Handrail", parent, new Vector3(a.Center.x + side * 1.8f, railY, railAxis),
+                        new Vector3(0.16f, 0.16f, run), rail);
             }
         }
 
