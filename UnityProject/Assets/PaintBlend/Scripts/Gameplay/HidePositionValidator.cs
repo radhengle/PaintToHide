@@ -31,13 +31,29 @@ namespace PaintBlend.Gameplay
                 return false;
             }
 
-            float poseHeight = GetPoseHeight(pose, standingHeight);
             Vector3 feet = slot.PoseAnchor.position;
-            Vector3 bottomSphere = feet + Vector3.up * radius;
-            Vector3 topSphere = feet + Vector3.up * (poseHeight - radius);
+            Vector3 bottomSphere;
+            Vector3 topSphere;
+            float capsuleRadius = radius;
+
+            if (pose == PoseType.LieDown)
+            {
+                // A lying mannequin occupies a horizontal capsule rather than
+                // a short vertical capsule that would invert its end points.
+                Vector3 axis = slot.PoseAnchor.right * 0.55f;
+                capsuleRadius = Mathf.Min(radius, 0.30f);
+                bottomSphere = feet + Vector3.up * capsuleRadius - axis;
+                topSphere = feet + Vector3.up * capsuleRadius + axis;
+            }
+            else
+            {
+                float poseHeight = Mathf.Max(GetPoseHeight(pose, standingHeight), radius * 2f);
+                bottomSphere = feet + Vector3.up * radius;
+                topSphere = feet + Vector3.up * (poseHeight - radius);
+            }
 
             int count = Physics.OverlapCapsuleNonAlloc(
-                bottomSphere, topSphere, radius, OverlapBuffer,
+                bottomSphere, topSphere, capsuleRadius, OverlapBuffer,
                 solidLayers, QueryTriggerInteraction.Ignore);
 
             for (int i = 0; i < count; i++)
