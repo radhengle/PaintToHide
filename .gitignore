@@ -1,0 +1,20 @@
+# Unity-generated data
+UnityProject/[Ll]ibrary/
+UnityProject/[Tt]emp/
+UnityProject/[Oo]bj/
+UnityProject/[Bb]uild/
+UnityProject/[Bb]uilds/
+UnityProject/[Ll]ogs/
+UnityProject/[Mm]emoryCaptures/
+UnityProject/UserSettings/
+UnityProject/*.csproj
+UnityProject/*.sln
+UnityProject/*.user
+# Blender exports and caches
+PaintBlend_ArtOutput/
+*.blend1
+# IDE / OS
+.vscode/
+.idea/
+.DS_Store
+Thumbs.db
