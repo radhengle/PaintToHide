@@ -957,6 +957,8 @@ namespace PaintBlend.Editor
                 slotObject.transform.SetParent(roomSlotParent, false);
                 slotObject.transform.position = center + new Vector3(-4.4f + i * 4.4f, 0.02f, -4.4f);
                 HidingSlot slot = slotObject.AddComponent<HidingSlot>();
+                slot.Configure(room.Id + "_Slot_" + (i + 1), room.Id + "_reference",
+                    PoseMask.All, 0.55f);
                 // These are placement candidates only. They still require NavMesh,
                 // collider and target-prop validation in the finished scene.
             }
