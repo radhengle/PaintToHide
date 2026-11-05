@@ -73,8 +73,6 @@ namespace PaintBlend.Editor
             WorldGraph worldGraph = root.AddComponent<WorldGraph>();
             worldGraph.Rebuild();
             BuildCorridorGrid(corridors.transform);
-            BuildGrandHallSignature(props.transform);
-            BuildGardenSignature(props.transform);
             BuildWorldLighting(lighting.transform);
             CreateSpawnMarkers(root.transform);
 
