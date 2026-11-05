@@ -5,6 +5,7 @@ using UnityEditor;
 using UnityEditor.SceneManagement;
 using UnityEngine;
 using UnityEngine.SceneManagement;
+using Unity.AI.Navigation;
 using PaintBlend.Gameplay;
 using PaintBlend.World;
 
@@ -75,6 +76,13 @@ namespace PaintBlend.Editor
             BuildCorridorGrid(corridors.transform);
             BuildWorldLighting(lighting.transform);
             CreateSpawnMarkers(root.transform);
+
+            // Bake a walkable surface for runtime hiding-slot validation and AI.
+            NavMeshSurface navMesh = root.AddComponent<NavMeshSurface>();
+            navMesh.collectObjects = CollectObjects.Children;
+            navMesh.useGeometry = NavMeshCollectGeometry.PhysicsColliders;
+            navMesh.layerMask = ~0;
+            navMesh.BuildNavMesh();
 
             Selection.activeGameObject = root;
             EditorSceneManager.MarkSceneDirty(SceneManager.GetActiveScene());
