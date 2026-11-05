@@ -70,6 +70,8 @@ namespace PaintBlend.Editor
 
             CreateMaterials();
             BuildRoomShells(architecture.transform, props.transform, slots.transform);
+            WorldGraph worldGraph = root.AddComponent<WorldGraph>();
+            worldGraph.Rebuild();
             BuildCorridorGrid(corridors.transform);
             BuildGrandHallSignature(props.transform);
             BuildGardenSignature(props.transform);
