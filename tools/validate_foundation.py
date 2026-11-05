@@ -4,7 +4,6 @@ from __future__ import annotations
 import ast
 import json
 from pathlib import Path
-import re
 import sys
 
 ROOT = Path(__file__).resolve().parents[1]
@@ -26,6 +25,7 @@ ASSET_BUILDERS = [
     "build_classroom", "build_arcade", "build_cinema", "build_gym",
     "build_music_studio", "build_laboratory", "build_garage", "build_kids_room",
     "build_laundry", "build_workshop", "build_attic", "build_basement", "build_rooftop",
+    "build_grand_hall_architecture", "build_player_mannequin", "build_colour_blaster",
 ]
 
 def require(condition: bool, message: str) -> None:
