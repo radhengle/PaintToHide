@@ -23,8 +23,14 @@ namespace PaintBlend.Painting
 
         public void BeginStroke()
         {
-            // Stroke grouping is owned by the surface actually hit. This method
-            // is provided for UI integration and intentionally paints nothing.
+            strokeActive = true;
+            activeStrokeSurface = null;
+        }
+
+        public void EndStroke()
+        {
+            strokeActive = false;
+            activeStrokeSurface = null;
         }
 
         public bool TryPaintScreenPoint(Vector2 screenPoint)
