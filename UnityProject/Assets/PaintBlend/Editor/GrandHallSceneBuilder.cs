@@ -418,8 +418,10 @@ namespace PaintBlend.Editor
                     BuildGallery(p, cream, gold, red, wood);
                     break;
                 case "GardenCourtyard":
-                case "RooftopTerrace":
                     BuildGarden(p, wood, cream, gold, plant, blue);
+                    break;
+                case "RooftopTerrace":
+                    BuildRooftop(p, wood, cream, gold, plant, blue);
                     break;
                 case "StorageRoom":
                     BuildStorage(p, grey, wood, blue, red, accent);
@@ -935,6 +937,17 @@ namespace PaintBlend.Editor
         private static void AddHidingSlots(RoomData room, Transform slots)
         {
             Transform roomSlotParent = Child(slots, room.Id + " Validated Slot Anchors").transform;
+            EnvironmentObjectMetadata reference = roomSlotParent.gameObject.AddComponent<EnvironmentObjectMetadata>();
+            SurfaceFamily surface = room.Id == "GardenCourtyard" ? SurfaceFamily.Foliage :
+                (room.Id == "RoyalPalace" || room.Id == "ArtGallery" || room.Id == "GrandHall"
+                    ? SurfaceFamily.Marble : (room.Id == "StorageRoom" || room.Id == "Garage"
+                        ? SurfaceFamily.Metal : SurfaceFamily.Wood));
+            Color roomReferenceColour = room.Id == "GardenCourtyard" ? new Color(0.20f, 0.44f, 0.18f) :
+                (room.Id == "RoyalPalace" ? new Color(0.66f, 0.035f, 0.08f) :
+                    (room.Id == "Kitchen" ? new Color(0.08f, 0.48f, 0.44f) :
+                        new Color(0.48f, 0.30f, 0.18f)));
+            reference.Configure(room.Id + "_reference", room.Title + " reference surface", surface,
+                roomReferenceColour, 0.55f);
             Vector3 center = room.Center;
             for (int i = 0; i < 3; i++)
             {
@@ -956,6 +969,34 @@ namespace PaintBlend.Editor
             GameObject seeker = new GameObject("Practice Seeker Spawn");
             seeker.transform.SetParent(spawnRoot.transform, false);
             seeker.transform.position = new Vector3(2.5f, 0.1f, -1f);
+
+            GameObject cameraObject = new GameObject("Main Camera — Preview");
+            cameraObject.tag = "MainCamera";
+            cameraObject.transform.SetParent(root, false);
+            cameraObject.transform.position = new Vector3(0f, 18f, -33f);
+            cameraObject.transform.LookAt(new Vector3(0f, 3.5f, 0f));
+            Camera camera = cameraObject.AddComponent<Camera>();
+            camera.fieldOfView = 55f;
+            camera.nearClipPlane = 0.1f;
+            camera.farClipPlane = 250f;
+            cameraObject.AddComponent<AudioListener>();
+        }
+
+        private static void BuildRooftop(Transform p, Material wood, Material cream, Material gold,
+            Material plant, Material blue)
+        {
+            Material parapet = Mat("RooftopWarmStone", new Color(0.78f, 0.66f, 0.57f));
+            Cube("Rooftop North Parapet", p, new Vector3(0f, 1.0f, 6.6f), new Vector3(15.5f, 2f, 0.35f), parapet);
+            Cube("Rooftop South Parapet", p, new Vector3(0f, 1.0f, -6.6f), new Vector3(15.5f, 2f, 0.35f), parapet);
+            Cube("Rooftop East Parapet", p, new Vector3(7.8f, 1.0f, 0f), new Vector3(0.35f, 2f, 13.5f), parapet);
+            Cube("Rooftop West Parapet", p, new Vector3(-7.8f, 1.0f, 0f), new Vector3(0.35f, 2f, 13.5f), parapet);
+            BuildPergola(p, wood, gold);
+            BuildPlant(p, new Vector3(-6.0f, 0f, -4.6f), cream, plant);
+            BuildPlant(p, new Vector3(6.0f, 0f, -4.6f), cream, plant);
+            Cube("Rooftop Outdoor Sofa Base", p, new Vector3(0f, 0.6f, -3.7f), new Vector3(5f, 0.8f, 1.3f), cream);
+            Cube("Rooftop Outdoor Sofa Back", p, new Vector3(0f, 1.4f, -4.2f), new Vector3(5f, 1.1f, 0.28f), blue);
+            Cylinder("Rooftop Telescope Tripod", p, new Vector3(5.3f, 0.9f, 4.5f), new Vector3(0.18f, 1.8f, 0.18f), gold);
+            Cylinder("Rooftop Telescope Tube", p, new Vector3(5.3f, 2.0f, 4.5f), new Vector3(0.28f, 1.6f, 0.28f), blue);
         }
 
         private static void BuildWorldLighting(Transform parent)
