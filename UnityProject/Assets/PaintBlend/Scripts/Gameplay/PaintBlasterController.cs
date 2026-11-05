@@ -23,12 +23,12 @@ namespace PaintBlend.Gameplay
         /// <summary>Call from the mobile Shoot button. Server validates timing, team and hit.</summary>
         public bool TryFire()
         {
-            if (cooldown == null || !cooldown.TryBeginLocalShot()) return false;
-            if (aimCamera == null || muzzle == null || authority == null)
+            if (cooldown == null || aimCamera == null || muzzle == null || authority == null)
             {
-                Debug.LogWarning("PaintBlasterController needs camera, muzzle and an authority adapter.", this);
+                Debug.LogWarning("PaintBlasterController needs a cooldown, camera, muzzle and authority adapter.", this);
                 return false;
             }
+            if (!cooldown.TryBeginLocalShot()) return false;
 
             Ray aimRay = aimCamera.ViewportPointToRay(new Vector3(0.5f, 0.5f, 0f));
             Vector3 direction = aimRay.direction.normalized;
