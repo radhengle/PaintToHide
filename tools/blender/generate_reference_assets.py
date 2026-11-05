@@ -543,6 +543,197 @@ def build_rooftop():
     return coll
 
 
+
+def poly_curve_mesh(name, points, radius, mat, coll, parent=None):
+    curve = bpy.data.curves.new(name + "_Curve", "CURVE")
+    curve.dimensions = "3D"
+    curve.resolution_u = 16
+    curve.bevel_depth = radius
+    curve.bevel_resolution = 4
+    spline = curve.splines.new("POLY")
+    spline.points.add(len(points) - 1)
+    for index, point in enumerate(points):
+        spline.points[index].co = (point[0], point[1], point[2], 1.0)
+    obj = bpy.data.objects.new(name, curve)
+    coll.objects.link(obj)
+    if parent:
+        obj.parent = parent
+    obj.data.materials.append(mat)
+    bpy.ops.object.select_all(action="DESELECT")
+    obj.select_set(True)
+    bpy.context.view_layer.objects.active = obj
+    bpy.ops.object.convert(target="MESH")
+    result = bpy.context.object
+    result.name = name
+    result.select_set(False)
+    return result
+
+def build_grand_hall_architecture():
+    coll = new_collection("GrandHallArchitecture")
+    root = asset_root("GrandHallArchitecture_AssetKit", coll)
+
+    # Tall pink-stone columns and capital details follow the atrium reference.
+    for x in (-7.0, -3.5, 3.5, 7.0):
+        for z in (-5.8, 5.8):
+            cylinder("Atrium_Column", (x,3.0,z), 0.40, 6.0, MAT["pink"], coll, root, 48, 0.055)
+            cylinder("Atrium_Column_Base", (x,0.18,z), 0.58, 0.36, MAT["ivory"], coll, root, 48, 0.045)
+            cylinder("Atrium_Column_Capital", (x,5.92,z), 0.64, 0.34, MAT["ivory"], coll, root, 48, 0.045)
+
+    # Rounded semicircular arch bands, converted to mesh for FBX export.
+    for z in (-5.8, 5.8):
+        for center_x in (-5.25, 0.0, 5.25):
+            points = []
+            radius = 2.0
+            spring = 4.85
+            for i in range(33):
+                angle = math.pi * i / 32.0
+                points.append((center_x + radius * math.cos(angle),
+                               spring + radius * math.sin(angle), z))
+            poly_curve_mesh("Atrium_Rounded_Arch", points, 0.16, MAT["ivory"], coll, root)
+
+    for x in (-7.0, 7.0):
+        for center_z in (-3.8, 0.0, 3.8):
+            points = []
+            radius = 1.7
+            spring = 4.85
+            for i in range(33):
+                angle = math.pi * i / 32.0
+                points.append((x, spring + radius * math.sin(angle),
+                               center_z + radius * math.cos(angle)))
+            poly_curve_mesh("Side_Gallery_Arch", points, 0.15, MAT["ivory"], coll, root)
+
+    # Continuous mezzanine galleries and elegant railings around the open atrium.
+    for x in (-7.2, 7.2):
+        cube("Mezzanine_Balcony_Floor", (x,5.55,0), (1.45,0.32,11.2), MAT["marble"], coll, root, 0.08)
+        for z in (-5.3, -2.65, 0.0, 2.65, 5.3):
+            cube("Balcony_Baluster", (x + (0.68 if x < 0 else -0.68),6.15,z),
+                 (0.12,1.15,0.12), MAT["ivory"], coll, root, 0.035)
+        cube("Balcony_Top_Rail", (x + (0.68 if x < 0 else -0.68),6.78,0),
+             (0.2,0.16,11.5), MAT["gold"], coll, root, 0.06)
+    for z in (-5.6,5.6):
+        cube("Mezzanine_Balcony_Floor", (0,5.55,z), (13.2,0.32,1.15), MAT["marble"], coll, root, 0.08)
+        for x in (-6.2,-3.1,0,3.1,6.2):
+            cube("Balcony_Baluster", (x,6.15,z + (0.52 if z < 0 else -0.52)),
+                 (0.12,1.15,0.12), MAT["ivory"], coll, root, 0.035)
+        cube("Balcony_Top_Rail", (0,6.78,z + (0.52 if z < 0 else -0.52)),
+             (13.4,0.16,0.2), MAT["gold"], coll, root, 0.06)
+
+    # Two red-carpet grand staircases with gold nosing and handrails.
+    for side in (-1,1):
+        for step in range(18):
+            x = side * (3.65 + step * 0.22)
+            y = 0.17 + step * 0.30
+            z = 4.9 - step * 0.52
+            cube("Grand_Stair_Red_Tread", (x,y,z), (3.15,0.28,0.68), MAT["red"], coll, root, 0.035)
+            cube("Grand_Stair_Gold_Nosing", (x,y+0.15,z+0.29), (3.15,0.055,0.08), MAT["gold"], coll, root, 0.018)
+        # Curved visual handrail sweep; a matching inner rail is added too.
+        rail_points = [(side*(3.1+i*0.25), 0.8+i*0.3, 5.15-i*0.52) for i in range(18)]
+        poly_curve_mesh("Grand_Stair_Handrail", rail_points, 0.075, MAT["gold"], coll, root)
+        cube("Grand_Stair_Landing", (side*7.35,5.45,-4.0), (3.0,0.35,2.4), MAT["marble"], coll, root, 0.08)
+
+    # Elliptical glass dome shell and individual curved ribs.
+    vertices, faces = [], []
+    rings, segments = 12, 64
+    base_y, rx, ry, rz = 7.0, 8.2, 4.2, 6.4
+    for ring in range(rings + 1):
+        theta = (math.pi * 0.5) * ring / rings
+        for segment in range(segments):
+            phi = math.tau * segment / segments
+            vertices.append((rx * math.sin(theta) * math.cos(phi),
+                             base_y + ry * math.cos(theta),
+                             rz * math.sin(theta) * math.sin(phi)))
+    for ring in range(rings):
+        for segment in range(segments):
+            a = ring * segments + segment
+            b = ring * segments + (segment + 1) % segments
+            c = (ring + 1) * segments + (segment + 1) % segments
+            d = (ring + 1) * segments + segment
+            faces.append((a,b,c,d))
+    mesh = bpy.data.meshes.new("GrandHall_GlassDome_Mesh")
+    mesh.from_pydata(vertices, [], faces)
+    mesh.materials.append(MAT["glass"])
+    mesh.update()
+    dome = bpy.data.objects.new("GrandHall_Glass_Dome", mesh)
+    coll.objects.link(dome)
+    dome.parent = root
+    for polygon in mesh.polygons:
+        polygon.use_smooth = True
+
+    for rib in range(16):
+        phi = math.tau * rib / 16.0
+        points = []
+        for step in range(25):
+            theta = (math.pi * 0.5) * step / 24.0
+            points.append((rx * math.sin(theta) * math.cos(phi) * 1.005,
+                           base_y + ry * math.cos(theta) * 1.005,
+                           rz * math.sin(theta) * math.sin(phi) * 1.005))
+        poly_curve_mesh("Dome_Gold_Rib", points, 0.045, MAT["gold"], coll, root)
+
+    # Central chandelier with eight curved arms and warm bulb housings.
+    cylinder("Grand_Chandelier_Central_Spindle", (0,8.0,0), 0.18, 2.1, MAT["gold"], coll, root)
+    sphere("Grand_Chandelier_Hub", (0,7.0,0), (0.75,0.45,0.75), MAT["gold"], coll, root)
+    for i in range(8):
+        angle = math.tau * i / 8.0
+        end = (2.0*math.cos(angle), 6.7, 2.0*math.sin(angle))
+        poly_curve_mesh("Chandelier_Arm",
+                        [(0,7.0,0), (end[0]*0.45,6.85,end[2]*0.45), end],
+                        0.075, MAT["gold"], coll, root)
+        sphere("Chandelier_Warm_Bulb", (end[0],6.45,end[2]),
+               (0.25,0.36,0.25), MAT["yellow"], coll, root)
+
+    # Reference banners and red carpet runner complete the key composition.
+    for i, x in enumerate((-6.0,-2.0,2.0,6.0)):
+        cube("GrandHall_Colour_Banner_%02d" % i, (x,4.6,6.0),
+             (1.15,2.2,0.12), [MAT["blue"],MAT["pink"],MAT["red"],MAT["yellow"]][i], coll, root, 0.045)
+    cube("GrandHall_Red_Carpet_Runner", (0,0.045,-2.0), (4.1,0.08,10.0), MAT["red"], coll, root, 0.05)
+    return coll
+
+def build_player_mannequin():
+    coll = new_collection("PlayerCharacter")
+    root = asset_root("PlayerMannequin_AssetKit", coll)
+    mannequin = material("PB_Mannequin_Warm_Wood", (0.62,0.36,0.18), 0.05, 0.34)
+    # Faceless, neutral human proportions at exactly 1.75m nominal height.
+    sphere("Mannequin_Head", (0,1.59,0), (0.19,0.22,0.19), mannequin, coll, root)
+    cylinder("Mannequin_Neck", (0,1.34,0), 0.09, 0.18, mannequin, coll, root, 32, 0.025)
+    cube("Mannequin_Chest", (0,1.08,0), (0.43,0.48,0.25), mannequin, coll, root, 0.11)
+    cube("Mannequin_Pelvis", (0,0.79,0), (0.35,0.25,0.23), mannequin, coll, root, 0.08)
+    for side in (-1,1):
+        hip = (side*0.12,0.72,0)
+        knee = (side*0.14,0.39,0.015)
+        ankle = (side*0.14,0.09,0.02)
+        rod_between("Mannequin_Thigh", hip, knee, 0.095, mannequin, coll, root)
+        sphere("Mannequin_Knee", knee, (0.10,0.10,0.10), mannequin, coll, root)
+        rod_between("Mannequin_Shin", knee, ankle, 0.075, mannequin, coll, root)
+        cube("Mannequin_Foot", (side*0.14,0.055,0.12), (0.16,0.11,0.32), mannequin, coll, root, 0.055)
+        shoulder = (side*0.27,1.21,0)
+        elbow = (side*0.36,0.91,0.015)
+        wrist = (side*0.39,0.67,0.02)
+        sphere("Mannequin_Shoulder", shoulder, (0.12,0.12,0.12), mannequin, coll, root)
+        rod_between("Mannequin_UpperArm", shoulder, elbow, 0.075, mannequin, coll, root)
+        sphere("Mannequin_Elbow", elbow, (0.08,0.08,0.08), mannequin, coll, root)
+        rod_between("Mannequin_Forearm", elbow, wrist, 0.06, mannequin, coll, root)
+        sphere("Mannequin_Hand", (side*0.4,0.61,0.02), (0.075,0.11,0.06), mannequin, coll, root)
+    # Keep a visible root and forward marker so the rigging artist has a stable origin.
+    cube("Mannequin_Footprint_Origin", (0,0.012,-0.2), (0.34,0.02,0.18), MAT["gold"], coll, root, 0.01)
+    return coll
+
+def build_colour_blaster():
+    coll = new_collection("ColourBlaster")
+    root = asset_root("ColourBlaster_AssetKit", coll)
+    cube("Blaster_Main_Housing", (0,1.25,0), (0.82,0.5,0.36), MAT["yellow"], coll, root, 0.16)
+    barrel = cylinder("Blaster_Cyan_Barrel", (0.54,1.34,0), 0.17, 0.78, MAT["blue"], coll, root, 48, 0.04)
+    barrel.rotation_euler[1] = math.pi/2
+    nozzle = cylinder("Blaster_Pink_Nozzle", (0.96,1.34,0), 0.19, 0.16, MAT["pinkpaint"], coll, root, 48, 0.04)
+    nozzle.rotation_euler[1] = math.pi/2
+    cube("Blaster_Grip", (0.05,0.87,-0.02), (0.25,0.55,0.26), MAT["pinkpaint"], coll, root, 0.08)
+    for side, colour in ((-1,MAT["blue"]),(1,MAT["pinkpaint"])):
+        cylinder("Blaster_Paint_Tank", (side*0.27,1.68,0), 0.18, 0.62, colour, coll, root, 40, 0.035)
+        cylinder("Blaster_Tank_Cap", (side*0.27,2.0,0), 0.21, 0.09, MAT["gold"], coll, root, 40, 0.02)
+    sphere("Blaster_Trigger", (0.1,1.0,-0.18), (0.12,0.10,0.07), MAT["gold"], coll, root)
+    cube("Blaster_Paint_Splash_Emblem", (0.0,1.25,-0.19), (0.35,0.24,0.035), MAT["pinkpaint"], coll, root, 0.06)
+    return coll
+
+
 def main():
     clear_scene()
     build_living_room()
@@ -551,6 +742,9 @@ def main():
     build_gallery_and_storage()
     build_office()
     build_hall_and_garden()
+    build_grand_hall_architecture()
+    build_player_mannequin()
+    build_colour_blaster()
     build_dining_room()
     build_bedroom()
     build_bathroom()
