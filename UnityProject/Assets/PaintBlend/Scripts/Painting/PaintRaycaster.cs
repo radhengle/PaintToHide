@@ -44,6 +44,15 @@ namespace PaintBlend.Painting
 
             PaintSurface surface = hit.collider.GetComponentInParent<PaintSurface>();
             if (surface == null) return false;
+            if (strokeActive && activeStrokeSurface != surface)
+            {
+                activeStrokeSurface = surface;
+                activeStrokeSurface.BeginStroke();
+            }
+            else if (!strokeActive)
+            {
+                surface.BeginStroke();
+            }
             return surface.Stamp(hit.textureCoord, brush);
         }
 
