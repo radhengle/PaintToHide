@@ -47,7 +47,7 @@ def main() -> int:
     require(BLENDER_SCRIPT.is_file(), "Blender asset generator is missing.")
     blender_source = BLENDER_SCRIPT.read_text(encoding="utf-8")
     ast.parse(blender_source, filename=str(BLENDER_SCRIPT))
-    missing_builders = [name for name in ASSET_BUILDERS if not re.search(rf"^def {name}\\(", blender_source, re.M)]
+    missing_builders = [name for name in ASSET_BUILDERS if f"def {name}(" not in blender_source]
     require(not missing_builders, "Blender room asset builders missing: " + ", ".join(missing_builders))
 
     for relative in (
