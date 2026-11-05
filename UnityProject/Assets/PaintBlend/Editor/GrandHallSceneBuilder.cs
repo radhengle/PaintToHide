@@ -325,7 +325,7 @@ namespace PaintBlend.Editor
             for (int row = 0; row < 5; row++)
             for (int col = 0; col < 4; col++)
             {
-                float x = ((col - 1) * StepX) + StepX * 0.5f;
+                float x = (col - 1.5f) * StepX;
                 float z = (2 - row) * StepZ;
                 Cube("East-West Corridor", parent, new Vector3(x, -0.12f, z),
                     new Vector3(StepX - RoomWidth, 0.24f, RoomDepth), floor);
@@ -352,7 +352,7 @@ namespace PaintBlend.Editor
             for (int row = 0; row < 4; row++)
             for (int col = 0; col < 4; col++)
             {
-                float x = ((col - 1) * StepX) + StepX * 0.5f;
+                float x = (col - 1.5f) * StepX;
                 float z = ((2 - row) * StepZ) - StepZ * 0.5f;
                 Cube("Corridor Junction", parent, new Vector3(x, -0.11f, z),
                     new Vector3(StepX - RoomWidth, 0.22f, StepZ - RoomDepth), floor);
@@ -362,7 +362,7 @@ namespace PaintBlend.Editor
         private static void BuildRoomProps(RoomData room, Transform props)
         {
             GameObject roomProps = Child(props, room.Id + " Props");
-            Vector3 origin = room.Center;
+            roomProps.transform.position = room.Center;
             Transform p = roomProps.transform;
             Material wood = Mat("WarmOak", new Color(0.43f, 0.22f, 0.10f), 0.08f, 0.45f);
             Material cream = Mat("WarmCream", new Color(0.96f, 0.86f, 0.72f));
