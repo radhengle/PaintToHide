@@ -29,7 +29,12 @@ namespace PaintBlend.World
             for (int i = 0; i < rooms.Count; i++)
             {
                 RoomMarker candidate = rooms[i];
-                if (candidate == null || candidate == source || candidate.FloorIndex != source.FloorIndex)
+                if (candidate == null || candidate == source)
+                    continue;
+
+                bool sameFloor = candidate.FloorIndex == source.FloorIndex;
+                bool stairLinked = IsExplicitStairLink(source.RoomId, candidate.RoomId);
+                if (!sameFloor && !stairLinked)
                     continue;
 
                 Vector3 delta = candidate.transform.position - origin;
@@ -42,6 +47,19 @@ namespace PaintBlend.World
                     result.Add(candidate);
             }
             return result;
+        }
+
+        private static bool IsExplicitStairLink(string first, string second)
+        {
+            return ArePair(first, second, "DiningRoom", "GrandHall") ||
+                   ArePair(first, second, "LaundryRoom", "Attic") ||
+                   ArePair(first, second, "Gym", "Basement") ||
+                   ArePair(first, second, "MusicStudio", "RooftopTerrace");
+        }
+
+        private static bool ArePair(string a, string b, string first, string second)
+        {
+            return (a == first && b == second) || (a == second && b == first);
         }
 
         public List<RoomMarker> FindRoute(RoomMarker start, RoomMarker destination)
