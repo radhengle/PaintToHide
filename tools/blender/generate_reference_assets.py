@@ -289,6 +289,260 @@ def build_hall_and_garden():
         cube("Pergola_Slat", (-4.5+i*1.5,4.9,0), (0.18,0.18,8.0), MAT["gold"], garden, groot, 0.025)
     return hall, garden
 
+
+def build_dining_room():
+    coll = new_collection("DiningRoom")
+    root = asset_root("DiningRoom_AssetKit", coll)
+    cube("Dining_Table_Top", (0,1.15,0), (5.2,0.18,2.5), MAT["oak"], coll, root, 0.09)
+    for x in (-2.25,2.25):
+        for z in (-0.95,0.95):
+            cube("Dining_Table_Leg", (x,0.55,z), (0.18,1.1,0.18), MAT["gold"], coll, root, 0.035)
+    for x in (-3.3,-1.1,1.1,3.3):
+        for z in (-2.0,2.0):
+            cube("Dining_Chair_Seat", (x,0.92,z), (0.92,0.22,0.92), MAT["cream"], coll, root, 0.12)
+            cube("Dining_Chair_Back", (x,1.55,z+(0.38 if z < 0 else -0.38)), (0.92,1.15,0.18), MAT["cream"], coll, root, 0.12)
+    cube("Dining_Sideboard", (0,0.9,4.2), (4.6,1.8,0.95), MAT["oak"], coll, root, 0.07)
+    for x in (-1.4,0,1.4):
+        sphere("Dining_Vase", (x,2.0,4.2), (0.28,0.45,0.28), MAT["gold"], coll, root)
+    for x in (-1.8,1.8):
+        cylinder("Chandelier_Pendant", (x,3.4,0), 0.38, 0.35, MAT["gold"], coll, root)
+    return coll
+
+def build_bedroom():
+    coll = new_collection("Bedroom")
+    root = asset_root("Bedroom_AssetKit", coll)
+    cube("Bed_Frame", (0,0.58,0), (4.0,0.9,5.6), MAT["oak"], coll, root, 0.12)
+    cube("Mattress", (0,1.12,0), (3.9,0.42,5.45), MAT["cream"], coll, root, 0.18)
+    cube("Blue_Duvet", (0,1.42,-0.65), (3.85,0.16,3.6), MAT["blue"], coll, root, 0.14)
+    cube("Headboard", (0,2.0,2.8), (4.3,2.0,0.28), MAT["pink"], coll, root, 0.15)
+    for x in (-1.0,1.0):
+        cube("Bed_Pillow", (x,1.48,1.85), (1.25,0.28,0.85), MAT["cream"], coll, root, 0.18)
+    for x in (-2.55,2.55):
+        cube("Bedside_Table", (x,0.65,2.2), (1.0,1.3,1.0), MAT["oak"], coll, root, 0.08)
+        cylinder("Bedside_Lamp_Base", (x,1.45,2.2), 0.22, 0.16, MAT["gold"], coll, root)
+        sphere("Bedside_Lamp_Shade", (x,1.82,2.2), (0.42,0.38,0.42), MAT["yellow"], coll, root)
+    cube("Wardrobe", (-5.2,2.0,-2.8), (2.2,4.0,1.5), MAT["oak"], coll, root, 0.08)
+    for x in (-5.6,-4.8):
+        cylinder("Wardrobe_Handle", (x,2.0,-3.62), 0.035, 0.48, MAT["gold"], coll, root, 16)
+    return coll
+
+def build_bathroom():
+    coll = new_collection("Bathroom")
+    root = asset_root("Bathroom_AssetKit", coll)
+    cube("Freestanding_Bath_Base", (2.8,0.58,1.4), (3.7,1.1,2.0), MAT["ivory"], coll, root, 0.32)
+    cube("Bath_Water", (2.8,1.1,1.4), (3.15,0.06,1.45), MAT["blue"], coll, root, 0.12)
+    cube("Vanity_Cabinet", (-3.4,0.8,3.4), (3.6,1.6,1.25), MAT["oak"], coll, root, 0.08)
+    cube("Vanity_Counter", (-3.4,1.65,3.4), (3.8,0.16,1.4), MAT["marble"], coll, root, 0.06)
+    sphere("Wash_Basin", (-3.4,1.77,3.25), (0.75,0.16,0.46), MAT["ivory"], coll, root)
+    cube("Bathroom_Mirror_Frame", (-3.4,2.9,4.15), (2.5,2.15,0.14), MAT["gold"], coll, root, 0.07)
+    cube("Bathroom_Mirror", (-3.4,2.9,4.06), (2.25,1.9,0.05), MAT["glass"], coll, root, 0.02)
+    cylinder("Toilet_Base", (4.8,0.42,-3.5), 0.42, 0.84, MAT["ivory"], coll, root)
+    sphere("Toilet_Bowl", (4.8,0.82,-3.5), (0.55,0.26,0.8), MAT["ivory"], coll, root)
+    cube("Shower_Glass_Panel", (-0.3,2.0,-4.3), (0.12,4.0,4.2), MAT["glass"], coll, root, 0.025)
+    return coll
+
+def build_library():
+    coll = new_collection("Library")
+    root = asset_root("Library_AssetKit", coll)
+    for x in (-5.0,-1.8,1.8,5.0):
+        cube("Library_Bookcase_Back", (x,2.3,3.7), (2.5,4.6,0.22), MAT["oak"], coll, root, 0.045)
+        for y in (0.55,1.45,2.35,3.25,4.15):
+            cube("Library_Shelf", (x,y,3.48), (2.45,0.12,0.52), MAT["gold"], coll, root, 0.025)
+        for i in range(8):
+            height = 0.55 + (i % 3) * 0.12
+            cube("Library_Book", (x-0.98+i*0.27,0.62+height/2,3.42),
+                 (0.2,height,0.35), [MAT["blue"],MAT["red"],MAT["green"],MAT["gold"]][i%4], coll, root, 0.015)
+    cube("Reading_Table", (0,1.1,-1.2), (4.2,0.18,2.0), MAT["oak"], coll, root, 0.07)
+    for x in (-2.1,2.1):
+        for z in (-0.8,0.8):
+            cube("Reading_Table_Leg", (x,0.52,-1.2+z), (0.14,1.05,0.14), MAT["oak"], coll, root, 0.025)
+    rod_between("Library_Ladder_Left", (5.9,0.1,2.2), (5.9,3.3,3.2), 0.055, MAT["gold"], coll, root)
+    rod_between("Library_Ladder_Right", (6.45,0.1,2.2), (6.45,3.3,3.2), 0.055, MAT["gold"], coll, root)
+    return coll
+
+def build_classroom():
+    coll = new_collection("Classroom")
+    root = asset_root("Classroom_AssetKit", coll)
+    for row in range(2):
+        for col in range(3):
+            x, z = -3.6 + col*3.6, 2.2-row*4.1
+            cube("Student_Desk", (x,1.0,z), (2.0,0.16,1.25), MAT["oak"], coll, root, 0.06)
+            cube("Student_Chair_Seat", (x,0.65,z-1.25), (1.0,0.18,0.9), MAT["blue"], coll, root, 0.07)
+            cube("Student_Chair_Back", (x,1.25,z-1.65), (1.0,1.0,0.16), MAT["blue"], coll, root, 0.07)
+    cube("Classroom_Chalkboard_Frame", (0,3.0,4.5), (7.8,2.6,0.22), MAT["oak"], coll, root, 0.06)
+    cube("Classroom_Chalkboard", (0,3.0,4.36), (7.3,2.15,0.05), MAT["green"], coll, root, 0.015)
+    sphere("Classroom_Globe", (-5.0,1.9,3.1), (0.55,0.55,0.55), MAT["blue"], coll, root)
+    return coll
+
+def build_arcade():
+    coll = new_collection("Arcade")
+    root = asset_root("Arcade_AssetKit", coll)
+    for i, x in enumerate((-5.0,-1.7,1.7,5.0)):
+        cube("Arcade_Cabinet_%02d" % i, (x,1.7,3.5), (1.65,3.4,1.3),
+             [MAT["blue"],MAT["pink"],MAT["red"],MAT["yellow"]][i], coll, root, 0.12)
+        cube("Arcade_Screen_Frame", (x,2.25,2.82), (1.28,1.08,0.14), MAT["gold"], coll, root, 0.04)
+        cube("Arcade_Screen", (x,2.25,2.72), (1.12,0.9,0.05), MAT["blue"], coll, root, 0.02)
+        cylinder("Arcade_Joystick", (x-0.38,1.2,2.7), 0.1, 0.25, MAT["red"], coll, root)
+        sphere("Arcade_Button", (x+0.32,1.25,2.7), (0.12,0.12,0.12), MAT["yellow"], coll, root)
+    cube("Pool_Table_Body", (0,0.9,-2.5), (5.3,0.8,2.8), MAT["oak"], coll, root, 0.1)
+    cube("Pool_Table_Felt", (0,1.34,-2.5), (4.95,0.08,2.45), MAT["green"], coll, root, 0.04)
+    for i in range(5):
+        sphere("Pool_Ball_%02d" % i, (-1.4+i*0.65,1.48,-2.5), (0.12,0.12,0.12),
+               [MAT["yellow"],MAT["red"],MAT["blue"],MAT["cream"],MAT["pink"]][i], coll, root)
+    return coll
+
+def build_cinema():
+    coll = new_collection("Cinema")
+    root = asset_root("Cinema_AssetKit", coll)
+    cube("Cinema_Screen_Frame", (0,3.2,5.2), (9.0,5.0,0.25), MAT["gold"], coll, root, 0.08)
+    cube("Cinema_Screen", (0,3.2,5.05), (8.55,4.55,0.06), MAT["blue"], coll, root, 0.025)
+    for row in range(3):
+        for col in range(4):
+            x, z = -3.9+col*2.6, -1.0-row*2.2
+            cube("Cinema_Seat_Base", (x,0.85,z), (2.0,0.75,1.55), MAT["red"], coll, root, 0.16)
+            cube("Cinema_Seat_Back", (x,1.65,z-0.58), (2.0,1.35,0.38), MAT["red"], coll, root, 0.16)
+            for arm in (-1,1):
+                cube("Cinema_Armrest", (x+arm*0.95,1.15,z), (0.18,0.78,1.35), MAT["gold"], coll, root, 0.05)
+    return coll
+
+def build_gym():
+    coll = new_collection("Gym")
+    root = asset_root("Gym_AssetKit", coll)
+    cube("Treadmill_Deck", (-4.0,0.7,1.2), (3.4,0.32,1.3), MAT["metal"], coll, root, 0.12)
+    cube("Treadmill_Belt", (-4.0,0.9,1.2), (3.1,0.05,1.05), MAT["blue"], coll, root, 0.04)
+    for x in (-5.3,-2.7):
+        rod_between("Treadmill_Handrail", (x,0.9,1.8), (x,2.3,2.4), 0.06, MAT["metal"], coll, root)
+    cube("Weight_Rack", (4.3,1.0,2.8), (2.4,2.0,0.3), MAT["metal"], coll, root, 0.04)
+    for i in range(5):
+        cylinder("Weight_Plate_%02d" % i, (3.4+i*0.45,1.55,2.8), 0.28, 0.18, MAT["blue"], coll, root)
+    sphere("Exercise_Ball", (3.5,0.9,-2.8), (0.9,0.9,0.9), MAT["pink"], coll, root)
+    cube("Yoga_Mat", (-2.0,0.08,-3.0), (3.0,0.12,1.3), MAT["blue"], coll, root, 0.06)
+    return coll
+
+def build_music_studio():
+    coll = new_collection("MusicStudio")
+    root = asset_root("MusicStudio_AssetKit", coll)
+    cube("Grand_Piano_Body", (-3.4,0.95,2.2), (3.8,1.55,1.5), MAT["oak"], coll, root, 0.12)
+    cube("Piano_Keyboard", (-3.4,1.78,1.35), (2.9,0.08,0.3), MAT["cream"], coll, root, 0.025)
+    for i in range(6):
+        cube("Piano_Black_Key_%02d" % i, (-4.65+i*0.48,1.85,1.25), (0.18,0.07,0.16), MAT["metal"], coll, root, 0.01)
+    cylinder("Bass_Drum", (2.0,1.0,2.0), 0.82, 0.65, MAT["red"], coll, root)
+    for i in range(3):
+        cylinder("Tom_Drum_%02d" % i, (0.9+i*1.1,1.8,2.0), 0.42, 0.48, MAT["metal"], coll, root)
+    for i in range(2):
+        rod_between("Cymbal_Stand", (3.7+i*0.9,0.0,1.7), (3.7+i*0.9,2.2,1.7), 0.035, MAT["gold"], coll, root)
+        sphere("Cymbal", (3.7+i*0.9,2.2,1.7), (0.72,0.06,0.72), MAT["gold"], coll, root)
+    for x in (-5.4,5.4):
+        cube("Amplifier", (x,1.2,-4.0), (1.6,2.4,1.0), MAT["metal"], coll, root, 0.06)
+        cylinder("Amplifier_Speaker", (x,1.2,-4.55), 0.52, 0.12, MAT["blue"], coll, root)
+    return coll
+
+def build_laboratory():
+    coll = new_collection("Laboratory")
+    root = asset_root("Laboratory_AssetKit", coll)
+    for x in (-4.2,0,4.2):
+        cube("Lab_Bench", (x,1.05,3.4), (3.5,0.18,1.5), MAT["metal"], coll, root, 0.05)
+        for i in range(3):
+            cylinder("Lab_Flask_%d_%d" % (int(x),i), (x-0.8+i*0.8,1.75,3.4),
+                     0.24+0.07*(i%2), 0.9, [MAT["blue"],MAT["green"],MAT["pink"]][i], coll, root, 32, 0.025)
+    cube("Lab_Cabinet", (-5.2,1.8,-3.5), (2.2,3.6,1.4), MAT["cream"], coll, root, 0.08)
+    sphere("Microscope_Base", (3.7,1.25,-3.5), (0.7,0.22,0.5), MAT["metal"], coll, root)
+    rod_between("Microscope_Arm", (3.7,1.3,-3.5), (4.2,2.5,-3.5), 0.075, MAT["metal"], coll, root)
+    return coll
+
+def build_garage():
+    coll = new_collection("Garage")
+    root = asset_root("Garage_AssetKit", coll)
+    cube("Car_Lower_Body", (0,0.85,0), (6.2,1.0,3.0), MAT["red"], coll, root, 0.42)
+    cube("Car_Cabin", (0,1.85,0.35), (3.8,1.2,2.6), MAT["blue"], coll, root, 0.38)
+    for x in (-2.0,2.0):
+        for z in (-1.55,1.55):
+            cylinder("Car_Tire", (x,0.62,z), 0.58, 0.32, MAT["metal"], coll, root, 48, 0.06)
+            cylinder("Car_Hub", (x,0.62,z*1.04), 0.24, 0.34, MAT["gold"], coll, root, 32, 0.03)
+    cube("Garage_Workbench", (-5.0,1.1,4.0), (3.0,2.2,1.3), MAT["oak"], coll, root, 0.08)
+    cube("Garage_ToolChest", (5.0,1.3,4.0), (2.0,2.6,1.3), MAT["red"], coll, root, 0.07)
+    return coll
+
+def build_kids_room():
+    coll = new_collection("KidsRoom")
+    root = asset_root("KidsRoom_AssetKit", coll)
+    for y in (1.0,3.0):
+        cube("Bunk_Bed_Mattress", (-3.5,y,0.5), (3.3,0.35,4.8), MAT["blue"] if y < 2 else MAT["pink"], coll, root, 0.15)
+        cube("Bunk_Bed_Rail", (-3.5,y+0.55,2.8), (3.4,0.3,0.18), MAT["oak"], coll, root, 0.06)
+    for x in (-5.0,-2.0):
+        rod_between("Bunk_Bed_Post", (x,0.0,2.4), (x,4.0,2.4), 0.09, MAT["oak"], coll, root)
+    cube("Toy_Chest", (4.2,0.65,-2.8), (2.6,1.3,1.8), MAT["yellow"], coll, root, 0.14)
+    sphere("Teddy_Bear_Body", (3.5,0.85,2.8), (0.72,0.85,0.55), MAT["oak"], coll, root)
+    sphere("Teddy_Bear_Head", (3.5,1.72,2.8), (0.58,0.58,0.5), MAT["oak"], coll, root)
+    for x in (3.0,4.0):
+        sphere("Teddy_Ear", (x,2.15,2.8), (0.22,0.26,0.18), MAT["oak"], coll, root)
+    return coll
+
+def build_laundry():
+    coll = new_collection("LaundryRoom")
+    root = asset_root("LaundryRoom_AssetKit", coll)
+    for x in (-4.2,0,4.2):
+        cube("Washer_Dryer_Body", (x,1.35,3.0), (2.7,2.7,1.8), MAT["cream"], coll, root, 0.13)
+        cylinder("Washer_Door_Rim", (x,1.35,2.05), 0.78, 0.18, MAT["metal"], coll, root, 48, 0.04)
+        cylinder("Washer_Door_Glass", (x,1.35,1.94), 0.62, 0.06, MAT["blue"], coll, root, 48, 0.025)
+    for x in (-4.2,0,4.2):
+        cylinder("Laundry_Basket", (x,0.55,-3.6), 0.58, 1.1, MAT["blue"], coll, root, 32, 0.04)
+    cube("Folding_Table", (0,1.05,0), (5.0,0.18,1.8), MAT["oak"], coll, root, 0.06)
+    return coll
+
+def build_workshop():
+    coll = new_collection("Workshop")
+    root = asset_root("Workshop_AssetKit", coll)
+    cube("Workshop_Bench_Top", (0,1.2,4.0), (8.0,0.22,1.5), MAT["oak"], coll, root, 0.06)
+    cube("Workshop_Pegboard", (0,3.0,4.8), (8.0,3.0,0.16), MAT["gold"], coll, root, 0.025)
+    for i in range(8):
+        x = -3.3+i*0.94
+        rod_between("Pegboard_Tool_Handle", (x,2.5,4.65), (x,3.3,4.65), 0.045, MAT["metal"], coll, root)
+    cube("Tool_Chest", (-4.7,0.9,-3.5), (2.0,1.8,1.5), MAT["red"], coll, root, 0.07)
+    cube("Timber_Stack", (3.8,0.7,-3.5), (3.0,1.4,1.7), MAT["oak"], coll, root, 0.05)
+    return coll
+
+def build_attic():
+    coll = new_collection("Attic")
+    root = asset_root("Attic_AssetKit", coll)
+    for x in (-4.2,0,4.2):
+        cube("Attic_Storage_Trunk", (x,0.8,1.2), (2.6,1.6,1.8), MAT["oak"], coll, root, 0.12)
+        cube("Attic_Trunk_Lid", (x,1.7,1.2), (2.65,0.18,1.85), MAT["gold"], coll, root, 0.08)
+    cube("Covered_Armchair", (-3.4,1.15,-3.2), (2.0,2.3,2.0), MAT["cream"], coll, root, 0.38)
+    sphere("Old_Globe", (4.7,1.3,-3.4), (0.85,0.85,0.85), MAT["blue"], coll, root)
+    rod_between("Attic_Rafter_Left", (-7,0,5.5), (0,5.5,5.5), 0.12, MAT["oak"], coll, root)
+    rod_between("Attic_Rafter_Right", (0,5.5,5.5), (7,0,5.5), 0.12, MAT["oak"], coll, root)
+    return coll
+
+def build_basement():
+    coll = new_collection("Basement")
+    root = asset_root("Basement_AssetKit", coll)
+    for x in (-5.4,-1.8,1.8,5.4):
+        rod_between("Basement_Utility_Pipe", (x,0,4.2), (x,4.5,4.2), 0.12, MAT["metal"], coll, root)
+        for y in (1.0,3.2):
+            cylinder("Pipe_Coupler", (x,y,4.2), 0.18, 0.28, MAT["gold"], coll, root)
+    cylinder("Basement_Water_Tank", (4.5,2.0,-3.6), 1.0, 4.0, MAT["metal"], coll, root)
+    cube("Electrical_Control_Cabinet", (-4.5,1.8,-3.7), (2.2,3.6,1.2), MAT["teal"], coll, root, 0.08)
+    cube("Basement_Utility_Shelf", (0,1.4,-4.5), (4.8,0.18,1.2), MAT["oak"], coll, root, 0.05)
+    return coll
+
+def build_rooftop():
+    coll = new_collection("Rooftop")
+    root = asset_root("Rooftop_AssetKit", coll)
+    for x in (-6.0,6.0):
+        for z in (-4.5,4.5):
+            cube("Rooftop_Pergola_Post", (x,2.3,z), (0.22,4.6,0.22), MAT["oak"], coll, root, 0.04)
+    for i in range(9):
+        cube("Rooftop_Pergola_Slat", (-5.2+i*1.3,4.65,0), (0.16,0.18,9.5), MAT["gold"], coll, root, 0.025)
+    cube("Rooftop_Outdoor_Sofa", (0,0.65,-3.2), (4.8,1.3,1.5), MAT["cream"], coll, root, 0.2)
+    for x in (-6.2,6.2):
+        cylinder("Rooftop_Planter", (x,0.45,-3.0), 0.65, 0.9, MAT["ivory"], coll, root)
+        sphere("Rooftop_Topiary", (x,1.6,-3.0), (0.75,1.1,0.75), MAT["green"], coll, root)
+    cylinder("Rooftop_Telescope_Tripod", (4.9,1.0,3.2), 0.16, 2.0, MAT["gold"], coll, root)
+    cylinder("Rooftop_Telescope_Tube", (4.9,2.1,3.2), 0.24, 1.65, MAT["blue"], coll, root)
+    return coll
+
+
 def main():
     clear_scene()
     build_living_room()
@@ -297,6 +551,23 @@ def main():
     build_gallery_and_storage()
     build_office()
     build_hall_and_garden()
+    build_dining_room()
+    build_bedroom()
+    build_bathroom()
+    build_library()
+    build_classroom()
+    build_arcade()
+    build_cinema()
+    build_gym()
+    build_music_studio()
+    build_laboratory()
+    build_garage()
+    build_kids_room()
+    build_laundry()
+    build_workshop()
+    build_attic()
+    build_basement()
+    build_rooftop()
 
     for coll in list(bpy.data.collections):
         if coll.name.startswith("PB_") and coll.objects:
