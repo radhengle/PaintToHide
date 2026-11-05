@@ -70,9 +70,10 @@ namespace PaintBlend.Painting
         {
             if (initialized) return true;
             if (targetRenderer == null) targetRenderer = GetComponent<Renderer>();
+            if (stampShader == null) stampShader = Shader.Find("PaintBlend/UVPaintStamp");
             if (targetRenderer == null || stampShader == null)
             {
-                Debug.LogWarning("PaintSurface needs a Renderer and UV stamp shader.", this);
+                Debug.LogWarning("PaintSurface needs a Renderer and the PaintBlend/UVPaintStamp shader.", this);
                 return false;
             }
 
