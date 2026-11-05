@@ -1,9 +1,11 @@
 # Blender Production Asset Pipeline
 
-The scene builder is a blockout/layout generator. The final game art must be authored as modular Blender assets using the reference images.
+The Unity scene builder is a blockout/layout generator. The Blender generator now exports separate editable kits for all 25 planned room types, the Grand Hall's dome/arches/balconies/staircases/chandelier, the shared mannequin block model and the colour blaster. These are reference-led first-pass meshes, not final approved production assets; the full art pass still needs refinement, proper UV/material QA, rigging, texture variation, LODs and in-Unity lighting review.
 
 ## Required model pack
-- Architecture: arch modules, columns/capitals, balustrades, doors, window frames, domed skylight ribs, staircase and fountain pieces.
+- Architecture: rounded pink-stone arch modules, columns/capitals, balcony balustrades, doors, window frames, glass dome shell/ribs, twin staircases, chandelier and fountain pieces.
+- Shared player character: neutral faceless 1.75m warm-wood mannequin block model (same base for all teams); rigging, skinning and final animation clips remain a required rigging pass.
+- Colour blaster: playful toy/pichkari proportions with cyan barrel, pink nozzle, yellow housing, twin paint tanks, trigger and grip.
 - Living room: sectional sofa modules, seat/back cushions, coffee table, media console, TV, bookshelf, floor lamp and plant pots.
 - Royal palace: throne, dais steps, carved gold trim, paired lion statues, armor stands, royal banners and red carpet trim.
 - Kitchen: modular teal cabinets, blue fridge, stove/hood, island/table, yellow chairs, shelves, jars, hanging utensils and flower vase.
