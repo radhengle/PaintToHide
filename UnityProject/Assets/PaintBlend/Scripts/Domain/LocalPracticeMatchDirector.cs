@@ -60,10 +60,17 @@ namespace PaintBlend.Domain
 
         private void Update()
         {
-            if (!running || secondsRemaining <= 0f) return;
-            secondsRemaining = Mathf.Max(0f, secondsRemaining - Time.deltaTime);
-            if (secondsRemaining <= 0f) AdvancePhase();
-            else PhaseChanged?.Invoke(phase, secondsRemaining);
+            if (!running) return;
+            if (secondsRemaining > 0f)
+            {
+                secondsRemaining = Mathf.Max(0f, secondsRemaining - Time.deltaTime);
+                if (secondsRemaining > 0f)
+                {
+                    PhaseChanged?.Invoke(phase, secondsRemaining);
+                    return;
+                }
+            }
+            AdvancePhase();
         }
 
         private void AdvancePhase()
