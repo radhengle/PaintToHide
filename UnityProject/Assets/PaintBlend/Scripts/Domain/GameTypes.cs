@@ -5,6 +5,7 @@ namespace PaintBlend.Domain
 {
     public enum GamePhase { Lobby, TeamAssignment, Preparation, ActiveRound, Reveal, Complete }
     public enum PlayerTeam { None, Hiders, Seekers }
+    public enum MatchWinner { None, Hiders, Seekers }
 
     [Serializable]
     public sealed class MatchParticipant
@@ -13,6 +14,7 @@ namespace PaintBlend.Domain
         public string DisplayName;
         public bool IsBot;
         public PlayerTeam Team;
+        public bool IsCaught;
     }
 
     public static class MatchPhaseDuration
