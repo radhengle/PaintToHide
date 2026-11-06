@@ -46,18 +46,25 @@ namespace PaintBlend.Domain
 
             roster.Clear();
             winner = MatchWinner.None;
+            var playerIds = new HashSet<string>(StringComparer.Ordinal);
             for (int i = 0; i < participants.Count; i++)
             {
-                MatchParticipant p = participants[i];
-                if (p == null || string.IsNullOrWhiteSpace(p.PlayerId))
+                MatchParticipant participant = participants[i];
+                if (participant == null || string.IsNullOrWhiteSpace(participant.PlayerId))
                 {
                     error = "Every participant needs a stable PlayerId.";
                     roster.Clear();
                     return false;
                 }
-                p.Team = PlayerTeam.None;
-                p.IsCaught = false;
-                roster.Add(p);
+                if (!playerIds.Add(participant.PlayerId))
+                {
+                    error = "The practice roster contains a duplicate PlayerId: " + participant.PlayerId;
+                    roster.Clear();
+                    return false;
+                }
+                participant.Team = PlayerTeam.None;
+                participant.IsCaught = false;
+                roster.Add(participant);
             }
 
             running = true;
