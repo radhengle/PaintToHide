@@ -16,14 +16,17 @@ namespace PaintBlend.Domain
         private GamePhase phase = GamePhase.Complete;
         private float secondsRemaining;
         private bool running;
+        private MatchWinner winner = MatchWinner.None;
 
         public GamePhase Phase => phase;
+        public MatchWinner Winner => winner;
         public float SecondsRemaining => secondsRemaining;
         public IReadOnlyList<MatchParticipant> Roster => roster;
         public bool IsOnlineAuthority => false;
 
         public event Action<GamePhase, float> PhaseChanged;
         public event Action<IReadOnlyList<MatchParticipant>> RosterAssigned;
+        public event Action<MatchParticipant> ParticipantCaught;
 
         public bool StartPractice(IList<MatchParticipant> participants, out string error)
         {
@@ -50,6 +53,8 @@ namespace PaintBlend.Domain
                     roster.Clear();
                     return false;
                 }
+                p.Team = PlayerTeam.None;
+                p.IsCaught = false;
                 roster.Add(p);
             }
 
@@ -71,6 +76,60 @@ namespace PaintBlend.Domain
                 }
             }
             AdvancePhase();
+        }
+
+        /// <summary>
+        /// Applies a server-confirmed or local-practice catch. This component is
+        /// offline-only; online callers must invoke equivalent logic on the server.
+        /// </summary>
+        public bool TryMarkHiderCaught(string playerId, out string error)
+        {
+            error = null;
+            if (phase != GamePhase.ActiveRound)
+            {
+                error = "Players can only be caught during the active round.";
+                return false;
+            }
+            if (string.IsNullOrWhiteSpace(playerId))
+            {
+                error = "A valid PlayerId is required.";
+                return false;
+            }
+
+            MatchParticipant target = roster.Find(p => p.PlayerId == playerId);
+            if (target == null)
+            {
+                error = "The player is not part of this match.";
+                return false;
+            }
+            if (target.Team != PlayerTeam.Hiders)
+            {
+                error = "Only Hiders can be caught.";
+                return false;
+            }
+            if (target.IsCaught)
+            {
+                error = "This Hider has already been caught.";
+                return false;
+            }
+
+            target.IsCaught = true;
+            ParticipantCaught?.Invoke(target);
+            if (CountRemainingHiders() == 0)
+            {
+                winner = MatchWinner.Seekers;
+                SetPhase(GamePhase.Reveal);
+            }
+            return true;
+        }
+
+        private int CountRemainingHiders()
+        {
+            int remaining = 0;
+            for (int i = 0; i < roster.Count; i++)
+                if (roster[i].Team == PlayerTeam.Hiders && !roster[i].IsCaught)
+                    remaining++;
+            return remaining;
         }
 
         private void AdvancePhase()
@@ -97,6 +156,7 @@ namespace PaintBlend.Domain
                     SetPhase(GamePhase.ActiveRound);
                     break;
                 case GamePhase.ActiveRound:
+                    winner = CountRemainingHiders() > 0 ? MatchWinner.Hiders : MatchWinner.Seekers;
                     SetPhase(GamePhase.Reveal);
                     break;
                 case GamePhase.Reveal:
