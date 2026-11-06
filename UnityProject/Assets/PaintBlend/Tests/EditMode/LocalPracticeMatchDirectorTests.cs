@@ -84,6 +84,7 @@ namespace PaintBlend.Tests
         [Test]
         public void RepeatedCatchIsRejected()
         {
+            roster.Add(new MatchParticipant { PlayerId = "human-c" });
             AdvanceToActiveRound();
             MatchParticipant hider = roster.Find(p => p.Team == PlayerTeam.Hiders);
             string error;
