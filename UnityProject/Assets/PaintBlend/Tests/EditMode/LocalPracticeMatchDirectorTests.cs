@@ -72,6 +72,17 @@ namespace PaintBlend.Tests
         }
 
         [Test]
+        public void DuplicatePlayerIdsAreRejectedBeforeLobbyStarts()
+        {
+            roster[1].PlayerId = roster[0].PlayerId;
+            string error;
+
+            Assert.IsFalse(director.StartPractice(roster, out error));
+            Assert.That(error, Does.Contain("duplicate PlayerId"));
+            Assert.AreEqual(GamePhase.Complete, director.Phase);
+        }
+
+        [Test]
         public void CatchOutsideActiveRoundIsRejected()
         {
             string error;
