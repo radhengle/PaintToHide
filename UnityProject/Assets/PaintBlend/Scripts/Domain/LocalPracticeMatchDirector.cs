@@ -44,6 +44,7 @@ namespace PaintBlend.Domain
             }
 
             roster.Clear();
+            winner = MatchWinner.None;
             for (int i = 0; i < participants.Count; i++)
             {
                 MatchParticipant p = participants[i];
