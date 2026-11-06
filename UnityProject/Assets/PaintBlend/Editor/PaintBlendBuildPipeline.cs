@@ -38,7 +38,7 @@ namespace PaintBlend.Editor
                 throw new FileNotFoundException("Generated Grand Hall scene was not saved.", ScenePath);
 
             PlayerSettings.productName = "Paint & Blend";
-            PlayerSettings.applicationIdentifier = "com.paintblend.game";
+            PlayerSettings.applicationIdentifier = "com.radhengle.paintblend";
             PlayerSettings.bundleVersion = "0.1.0";
             PlayerSettings.Android.targetArchitectures = AndroidArchitecture.ARM64;
             PlayerSettings.SetScriptingBackend(BuildTargetGroup.Android, ScriptingImplementation.IL2CPP);
