@@ -16,11 +16,23 @@ namespace PaintBlend.Domain
             }
 
             var indices = new List<int>(participants.Count);
+            var playerIds = new HashSet<string>(StringComparer.Ordinal);
             for (int i = 0; i < participants.Count; i++)
             {
-                if (participants[i] == null)
+                MatchParticipant participant = participants[i];
+                if (participant == null)
                 {
                     error = "Roster contains a null participant.";
+                    return false;
+                }
+                if (string.IsNullOrWhiteSpace(participant.PlayerId))
+                {
+                    error = "Every participant needs a non-empty PlayerId.";
+                    return false;
+                }
+                if (!playerIds.Add(participant.PlayerId))
+                {
+                    error = "Roster contains a duplicate PlayerId: " + participant.PlayerId;
                     return false;
                 }
                 indices.Add(i);
