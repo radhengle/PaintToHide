@@ -12,6 +12,9 @@ No milestone is accepted because code exists or a project compiles. Every milest
 - [x] 25-location map catalogue and connected-building plan.
 - [x] Unity runtime/editor code foundation.
 - [x] Static CI validation for project manifest, room catalogue and Blender generator syntax.
+- [x] Deterministic Unity batch-mode scene generation and Android ARM64 IL2CPP build entry point.
+- [x] Unity EditMode test and Android APK CI workflow added; execution is gated on repository Unity license configuration.
+- [ ] Unity Editor import/compilation, EditMode test run and Android APK build verified on a licensed Unity runner.
 - [ ] Unity 2022.3.50f1 project opens cleanly and compiles with zero errors/warnings requiring action.
 - [ ] Blender generator executes successfully and exports all declared asset kits.
 - [ ] Generated files are imported into Unity and reviewed in the target URP renderer.
