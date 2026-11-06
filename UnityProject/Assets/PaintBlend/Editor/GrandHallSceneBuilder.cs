@@ -49,7 +49,9 @@ namespace PaintBlend.Editor
         [MenuItem("Tools/Paint & Blend/Build Grand Hall Blockout")]
         public static void BuildGrandHallBlockout()
         {
-            if (!EditorUtility.DisplayDialog(
+            // Batch-mode CI must be able to generate the scene without a modal dialog.
+            // Interactive editor users still receive the destructive-action confirmation.
+            if (!Application.isBatchMode && !EditorUtility.DisplayDialog(
                 "Build Paint & Blend World",
                 "This replaces the existing generated PAINT_BLEND_GRAND_HALL_COMPLEX root in the open scene. Continue?",
                 "Build World", "Cancel"))
