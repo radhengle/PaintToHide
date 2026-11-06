@@ -52,6 +52,7 @@ No milestone is accepted because code exists or a project compiles. Every milest
 - [ ] Character scale, hitbox and collision never change when paint/texture is applied.
 
 ## M4 — Complete match, combat and presentation
+- [x] Offline practice match phase clock, balanced team assignment, participant catch state and Hider/Seeker win-condition logic implemented with EditMode test coverage (Unity execution still pending).
 - [ ] Main menu, profile, customize, theme/map selection, shop/rewards entry points, settings, help and exit flows are functional.
 - [ ] Quick Play, Create Private Room, Join by Room ID, Join by invitation link and Practice with Bots are implemented.
 - [ ] Match lifecycle: 90-second lobby, team assignment, 90-second preparation, 180-second active round and 30-second reveal/results.
