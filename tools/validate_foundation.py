@@ -59,6 +59,8 @@ def main() -> int:
         "Assets/PaintBlend/Scripts/AI/SeekerBotPlanner.cs",
         "Assets/PaintBlend/Scripts/World/WorldGraph.cs",
         "Assets/PaintBlend/Shaders/UVPaintStamp.shader",
+        "Assets/PaintBlend/Editor/PaintBlendBuildPipeline.cs",
+        "Assets/PaintBlend/Tests/EditMode/TeamAllocatorTests.cs",
     ):
         require((PROJECT / relative).is_file(), f"Required runtime source missing: {relative}")
 
