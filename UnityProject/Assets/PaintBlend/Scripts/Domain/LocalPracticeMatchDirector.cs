@@ -31,6 +31,7 @@ namespace PaintBlend.Domain
         public bool StartPractice(IList<MatchParticipant> participants, out string error)
         {
             error = null;
+            if (running) { error = "A practice match is already running."; return false; }
             if (config == null) { error = "Assign a MatchConfig asset first."; return false; }
             if (participants == null || participants.Count < config.MinimumPlayers)
             {
